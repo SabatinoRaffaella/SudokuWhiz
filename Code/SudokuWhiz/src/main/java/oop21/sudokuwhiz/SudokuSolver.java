@@ -14,9 +14,9 @@ public class SudokuSolver {
 
     private static final int SIZE = 9;
 
-    /// BACKTRACKING DI BASE
+    /// ALGORITMO DI BACKTRACKING
     /**
-     * Risolve il sudoku passato come parametro utilizzando il Backtracking.
+     * Risolve la griglia Sudoku passata come parametro utilizzando il Backtracking.
      * 
      * @param sudo_m: matrice del sudoku da risolvere.
      * @return sudo_m (soluzione del sudoku) o null nel caso in cui il sudoku non
@@ -37,7 +37,7 @@ public class SudokuSolver {
         int col = 0;
         boolean checkBlankSpaces = false;
         /*
-         * controllo se il sudoku è risolto e in caso negativo,
+         * controllo se il Sudoku è risolto e, in caso negativo,
          * prendo la posizione della prossima cella "vuota"
          */
         for (row = 0; row < sudo_m.length; row++) {
@@ -51,7 +51,7 @@ public class SudokuSolver {
                 break;
             }
         }
-        // se non ci sono più celle "vuote" significa che il sudoku è stato risolto.
+        // se non ci sono più celle "vuote" significa che il Sudoku è stato risolto.
         if (checkBlankSpaces == false) {
             return true;
         }
@@ -59,7 +59,7 @@ public class SudokuSolver {
         for (int num = 1; num <= 9; num++) {
             /*
              * isSafe controlla che num non sia già presente
-             * nella riga, colonna, o area-regione 3x3
+             * nella riga, colonna, o sotto-griglia 3x3
              * (sotto le funzioni che si occupano di fare questi controlli)
              */
             countNodes++;
@@ -145,7 +145,12 @@ public class SudokuSolver {
         return false;
     }
 
+    /// ALGORITMO DI RICERCA A*
+
     public int[][] solveSudoku_AsteriskA(int sudo_m[][]) {
+        int exploredNodes = 0; //contatore per tenere traccia dei nodi visitati durante la ricerca
+        int totalGeneratedNodes = 0; //numero dei nodi generati
+
         /*
          * Setup per la coda prioritaria che deve dare priorità agli stati in cui
          * ho il minimo numero di possibilità per ogni cella.
@@ -174,15 +179,20 @@ public class SudokuSolver {
         queue.add(initialState);
         while (!queue.isEmpty()) {
             BoardState currentState = queue.poll();
+            exploredNodes++;
             if (currentState.isSolved()) {
                 sudo_m = currentState.getJuiaLuigiBoard();
                 ManageMatrix m = new ManageMatrix();
                 m.printMatrix(sudo_m);
+                System.out.println("Numero nodi esplorati: " + exploredNodes);
+                System.out.println("Numero totale dei nodi generati: " + totalGeneratedNodes);
                 return sudo_m;
             }
             List<BoardState> nextStates = currentState.generateNextStates();
+            totalGeneratedNodes++;  //conteggio per ogni stato generato
+            totalGeneratedNodes += nextStates.size();
             queue.addAll(nextStates);
         }
-        return null; // No solution found
+        return null; // Soluzione non trovata
     }
 }
