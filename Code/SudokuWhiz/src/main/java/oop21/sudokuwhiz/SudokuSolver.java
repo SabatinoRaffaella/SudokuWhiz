@@ -66,10 +66,10 @@ public class SudokuSolver {
 
             if (isSafe(sudo_m, row, col, num)) {
                 sudo_m[row][col] = num;
+                String nodeKey = row + "-" + col + "-" + num;
+                exploredNodes.add(nodeKey);
                 if (solveSudoku_basic(sudo_m)) {
                     // table.getModel().setValueAt(num, row, col);
-                    String nodeKey = row + "-" + col + "-" + num;
-                    exploredNodes.add(nodeKey);
                     return true;
                 }
                 /*
