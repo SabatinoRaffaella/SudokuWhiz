@@ -5,6 +5,7 @@ import utils.ManageMatrix;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -18,15 +19,18 @@ public class RunButtonPressed implements ActionListener{
     JPanel panel;
     int sudo_m[][];
     ButtonGroup choiceAlg;
+    JButton runButton;
     
-    public void getInfo (JPanel panel, int sudo_m[][], ButtonGroup choiceAlg){
+    public void getInfo (JPanel panel, int sudo_m[][], ButtonGroup choiceAlg, JButton runButton){
         this.panel = panel;
         this.sudo_m = sudo_m;
         this.choiceAlg = choiceAlg;
+        this.runButton = runButton;
         System.out.println(choiceAlg.getSelection().getActionCommand());       
     } 
     @Override
     public void actionPerformed(ActionEvent ae) {
+        runButton.setEnabled(false);
         ManageMatrix m = new ManageMatrix();
         m.printMatrix(this.sudo_m);
         SudokuSolver s = new SudokuSolver();
@@ -55,7 +59,7 @@ public class RunButtonPressed implements ActionListener{
         time.setText(Double.toString(elapsedTimeInSecond)); 
         JTable table = (JTable) panel.getComponent(0);
         MatrxiModel mm = (MatrxiModel)table.getModel();
-        mm.replaceTable(sudo_m);     
+        mm.replaceTable(sudo_m);
         panel.revalidate();
         panel.repaint();
         

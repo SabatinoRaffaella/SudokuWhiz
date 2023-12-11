@@ -22,7 +22,8 @@ public class SudokuWhizWhiz extends javax.swing.JFrame {
         initComponents();
         backtrack.setActionCommand("BackTracking");
         a_stellato.setActionCommand("A_Star");
-        jRadioButton3.setActionCommand("jRadioButton3");        
+        jRadioButton3.setActionCommand("jRadioButton3"); 
+        runButton.setEnabled(false);
     }
 
     /**
@@ -172,7 +173,8 @@ public class SudokuWhizWhiz extends javax.swing.JFrame {
             sudo_m = s.recoverFileData();
             if(panel2.getComponentCount()==0){
                s.setFirstLayout();
-            }                
+            }
+            runButton.setEnabled(true);
             jf.addActionListener(s);
             jf.approveSelection();
        }
@@ -183,9 +185,11 @@ public class SudokuWhizWhiz extends javax.swing.JFrame {
     }//GEN-LAST:event_callFileChooserActionPerformed
 
     private void runButtonMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_runButtonMousePressed
-       runButton.removeActionListener(rbp);
-       rbp.getInfo(panel2, sudo_m, choiceAlg);
-       runButton.addActionListener(rbp);
+       if(runButton.isEnabled()){
+            runButton.removeActionListener(rbp);
+            rbp.getInfo(panel2, sudo_m, choiceAlg, runButton);           
+            runButton.addActionListener(rbp);
+       }
     }//GEN-LAST:event_runButtonMousePressed
 
     /**
