@@ -1,5 +1,13 @@
 package oop21.sudokuwhiz;
+import java.util.Comparator;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Set;
+import utils.BoardState;
+import utils.ManageMatrix;
+
 public class SudokuSolver {
+    private static final int SIZE=9;
     ///BACKTRACKING DI BASE
     /**
      * Risolve il sudoku passato come parametro utilizzando il Backtracking. 
@@ -9,8 +17,7 @@ public class SudokuSolver {
      */
     public int [][] solve_sudoku_backtrack(int sudo_m[][]){
         if(solveSudoku_basic(sudo_m)==true) return sudo_m;
-        else return null;
-    
+        else return null;    
     }
     private boolean solveSudoku_basic(int sudo_m[][]){
         int row = 0;
@@ -41,6 +48,7 @@ public class SudokuSolver {
             if (isSafe(sudo_m, row, col, num)) {
                 sudo_m[row][col] = num;
             if (solveSudoku_basic(sudo_m)) {
+                //table.getModel().setValueAt(num, row, col);
                 return true;
             }
             /* se num è stato piazzato in una posizione scorretta, 
@@ -110,5 +118,46 @@ public class SudokuSolver {
         }
         return false;
     }
+    public int[][] solveSudoku_AsteriskA(int sudo_m[][]){        
+        /*
+        Setup per la coda prioritaria che deve dare priorità agli stati in cui
+        ho il minimo numero di possibilità per ogni cella.
+        */
+        PriorityQueue<BoardState> queue = new PriorityQueue<>(Comparator.comparingInt(state -> {
+            int emptyCellCount = 0;
+            int minPossibilities = SIZE + 1;
+            for (int i = 0; i < SIZE; i++) {
+                for (int j = 0; j < SIZE; j++) {
+                    if (state.getJuiaLuigiBoard()[i][j] == 0) {
+                        emptyCellCount++;
+                        int countPoss = 0;
+                        String possibilities = state.getPossibleValues(i, j);
+                        for(int v = 0; v < possibilities.length(); v++)
+                        	if(possibilities.charAt(v) == '1')
+                        		countPoss++;
+                        if (countPoss < minPossibilities) {
+                            minPossibilities = countPoss;
+                        }
+                    }
+                }
+            }
+            return emptyCellCount + minPossibilities;
+        }));
+        BoardState initialState = new BoardState(sudo_m);
+        queue.add(initialState);
+        while (!queue.isEmpty()) {
+            BoardState currentState = queue.poll();
+            if (currentState.isSolved()) {
+                sudo_m = currentState.getJuiaLuigiBoard();
+                ManageMatrix m= new ManageMatrix();
+                m.printMatrix(sudo_m);
+                return sudo_m;
+            }
+            List<BoardState> nextStates = currentState.generateNextStates();
+            queue.addAll(nextStates);
+        }
+        return null; // No solution found
+    }
 }
+
 
