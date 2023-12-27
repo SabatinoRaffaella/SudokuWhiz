@@ -105,8 +105,6 @@ public class BoardState {
                 possibilities &= ~(1 << sudo_m[subgridStartRow + i][subgridStartCol + j]); // check subgrid
             }
         }
-
-        //List<Integer> values = new ArrayList<>();
         
         StringBuilder result = new StringBuilder();
         for (int i = 1; i <= SIZE; i++) {
@@ -115,17 +113,6 @@ public class BoardState {
         }
 
         return result.toString();
-        /*
-        for (int i = 0; i < result.length(); i++) {
-            char bitChar = result.charAt(i);
-            if (bitChar == '1') {
-                int value = 9 - i;
-       
-       values.add(value);
-            }
-        }
-
-        return values;*/
     }
 
     
