@@ -1,12 +1,17 @@
 package utils;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.PriorityQueue;
 public class BoardState {
+
     private static final int SIZE=9;
     private static final int SUBGRID_SIZE=3;
     private int sudo_m[][];
+    private int pathCost = 0;
     private int possibleVals[][];
-    private static final int ALL_VALID = 511;
+    private int[] lastFilledCell;
+
     public BoardState(int sudo_m[][]){
         this.sudo_m = new int[SIZE][SIZE];
         for (int row = 0; row < SIZE; row++) {
@@ -14,10 +19,69 @@ public class BoardState {
                 this.sudo_m[row][col] = sudo_m[row][col];
             }
         }
+        this.pathCost = 0;
+        this.lastFilledCell = new int[2];
     }
-    public int[][] getJuiaLuigiBoard(){
+
+    public int[][] getSudokuBoard(){
         return this.sudo_m;
     }
+
+    public int getPathCost(){
+        return this.pathCost;
+    }
+
+    public void setPathCost(int cost){
+        this.pathCost = cost;
+    }
+
+    public int[] getLastFilledCell(){
+        if (lastFilledCell != null && lastFilledCell.length > 0) {
+            return lastFilledCell;
+        } else {
+            return null;
+        }
+    }
+
+    public void setLastFilledCell(int[] lastCell){
+        this.lastFilledCell = Arrays.copyOf(lastCell, 2);
+    }
+
+    /*Si determina il costo di cammino per raggiungere un nodo n dell'albero di ricerca, a 
+     * partire dal nodo radice, ovvero dallo stato iniziale, sapendo che:
+     * - inserimento/cancellazione di un numero : costa 2;
+     * - lettura del valore di una cella: costa 1;
+     * - spostamento da una cella ad una successiva: costa 1.
+     * Visto che la generazione di un nuovo stato currentState deriva dall'inserimento/cancellazione di un valore in una cella
+     * nello stato previousState, per determinare il costo di cammino si tiene conto della lettura del valore (0 nel caso della cella vuota),
+     * dell'inserimento del valore e della distanza tra l'ultima cella riempita in previousState e la cella riempita che ha generato currentState.
+     * Per determinare il numero di spostamenti si utilizza la distanza euclidea.
+     * Nel caso dello stato iniziale, il quale non ha traccia dell'ultima cella riempita, il numero di spostamenti per riempire una cella vuota
+     * verrà calcolato dalla cella (0,0). 
+     * 
+    */
+
+    public static int computePathCost(BoardState previousState, BoardState currentState){
+        // Considera il costo di inserimento e cancellazione nella cella attuale
+        int insertionDeletionCost = 2;
+        // Considera il costo di lettura della cella attuale
+        int readCost = 1;
+        //Calcolo lo spostamento dall'ultima cella riempita alla cella attuale mediante la distanza euclidea
+        int moveCost;
+        if(previousState.getLastFilledCell() == null)
+            moveCost = calculateMovementCost(0, 0, currentState.getLastFilledCell()[0], currentState.getLastFilledCell()[1]);
+        else
+            moveCost = calculateMovementCost(previousState.getLastFilledCell()[0], previousState.getLastFilledCell()[1], currentState.getLastFilledCell()[0], currentState.getLastFilledCell()[1]);
+        
+        return insertionDeletionCost + readCost + moveCost;
+    }
+
+    public static int calculateMovementCost(int row1, int col1, int row2, int col2) {
+        // Determina la distanza euclidea tra le due celle, arrotondando al valore intero più vicino
+        double euclideanDistance = Math.sqrt(Math.pow(row2 - row1, 2) + Math.pow(col2 - col1, 2));
+        return (int) Math.round(euclideanDistance);
+    }
+
     /***
      * Restituisce la lista dei possibili valori esplorando la 
      * matrice e rimuovendo quelli già usati, quindi se una cella è piena
@@ -132,31 +196,86 @@ public class BoardState {
         }
         return bestCell;
     }
+
+    /* Determina la prima cella della griglia vuota. 
+     * @return firstCell: la posizione (riga, colonna) della prima
+     * cella vuota.
+    */
+
+    public int[] findFirstEmptyCell() {
+        int[] firstCell = new int[2];
+
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (this.getSudokuBoard()[i][j] == 0) {
+                    firstCell[0] = i;
+                    firstCell[1] = j;
+                    break;
+                }
+            }
+        }
+        return firstCell;
+    }
+    
     /**
-     * Cerca la migliore cella su cui operare e i possibili valori che questa può assumere
-     * quindi la lista dei possibili valori creando delle copie-figli che utilizzano i diversi possibili
-     * valori per ottenere nuove configurazioni e le aggiunge alla lista dei possibili stati successivi 
-     * in cui può trovarsi il sudoku, di cui si vuole selezionare quello che più si avvicina allo
-     * stato obbiettivo.
-     * @return La lista dei possibili stati successivi in cui si può trovare la soluzione.
+     * Si cercano la migliore cella su cui operare con i possibili valori che questa può
+     * assumere e la prima cella della griglia vuota e l'insieme dei suoi valori ammissibili.
+     * In base alla distanza delle celle bestCell e firstEmptyCell dall'ultima cella riempita,
+     * si decide di creare delle copie-figli che utilizzano i diversi possibili
+     * valori di una delle due celle per ottenere nuove configurazioni e le aggiunge alla lista dei
+     * possibili stati successivi
+     * in cui può trovarsi il sudoku, di cui si vuole selezionare quello che più si
+     * avvicina allo stato obbiettivo.
+     * 
+     * @return La lista dei possibili stati successivi in cui si può trovare la
+     *         soluzione.
      */
     public List<BoardState> generateNextStates() {
-    	List<BoardState> nextStates = new ArrayList<>();
-    	int[] bestCell = findBestCell();
-    	int row = bestCell[0];
-    	int col = bestCell[1];
-    	String possibleValues = getPossibleValues(row, col);
+        List<BoardState> nextStates = new ArrayList<>();
+        int[] bestCell = findBestCell();
+        int[] firstEmptyCell = this.findFirstEmptyCell();
+        int rowB = bestCell[0];
+        int colB = bestCell[1];
+        int rowE = firstEmptyCell[0];
+        int colE = firstEmptyCell[1];
 
-    	for(int i = 0; i < possibleValues.length(); i++) {
-    		char bitChar = possibleValues.charAt(i);
-    		if (bitChar == '1') {
-    			int value = 9 - i;
-    			int[][] newBoard = copyBoard();
-    			newBoard[row][col] = value;
-    			nextStates.add(new BoardState(newBoard));            
-    		}
-    		
-    	}
-    	return nextStates;
+        if (calculateMovementCost(this.getLastFilledCell()[0], this.getLastFilledCell()[1], rowB, colB) <
+               calculateMovementCost(this.getLastFilledCell()[0], this.getLastFilledCell()[1], rowE, colE)) {
+                
+            String possibleValues = getPossibleValues(rowB, colB);
+
+            for (int i = 0; i < possibleValues.length(); i++) {
+                char bitChar = possibleValues.charAt(i);
+                if (bitChar == '1') {
+                    int value = 9 - i;
+                    int[][] newBoard = copyBoard();
+                    newBoard[rowB][colB] = value;
+                    BoardState newBoardState = new BoardState(newBoard);
+                    int computePath = computePathCost(this, newBoardState);
+                    newBoardState.setPathCost(computePath);
+                    newBoardState.setLastFilledCell(bestCell);
+                    nextStates.add(newBoardState);
+                }
+            }
+        } else {
+            String possibleValues = getPossibleValues(rowE, colE);
+
+            for (int i = 0; i < possibleValues.length(); i++) {
+                char bitChar = possibleValues.charAt(i);
+                if (bitChar == '1') {
+                    int value = 9 - i;
+                    int[][] newBoard = copyBoard();
+                    newBoard[rowE][colE] = value;
+                    BoardState newBoardState = new BoardState(newBoard);
+                    int computePath = computePathCost(this, newBoardState);
+                    newBoardState.setPathCost(computePath);
+                    newBoardState.setLastFilledCell(firstEmptyCell);
+                    nextStates.add(newBoardState);
+                }
+            }
+        }
+
+        return nextStates;
     }
+
 }

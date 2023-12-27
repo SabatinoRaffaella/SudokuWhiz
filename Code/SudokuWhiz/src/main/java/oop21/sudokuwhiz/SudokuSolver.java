@@ -3,6 +3,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
+import java.util.HashSet;
 import utils.BoardState;
 import utils.ManageMatrix;
 
@@ -118,17 +119,25 @@ public class SudokuSolver {
         }
         return false;
     }
-    public int[][] solveSudoku_AsteriskA(int sudo_m[][]){        
+
+    /// ALGORITMO DI RICERCA A*
+
+    public int[][] solveSudoku_AsteriskA(int sudo_m[][]) {
+        int exploredNodes = 0; //contatore per tenere traccia dei nodi visitati durante la ricerca
+        int totalGeneratedNodes = 0; //numero dei nodi generati
+        Set<BoardState> visitedStates = new HashSet<>(); //dichiarazione dell'insieme di nodi visitati
+        
         /*
-        Setup per la coda prioritaria che deve dare priorità agli stati in cui
-        ho il minimo numero di possibilità per ogni cella.
-        */
-        PriorityQueue<BoardState> queue = new PriorityQueue<>(Comparator.comparingInt(state -> {
+         * Setup per la coda prioritaria che deve dare priorità agli stati in cui
+         * ho il minimo numero di possibilità per ogni cella.
+         */
+        
+         PriorityQueue<BoardState> queue = new PriorityQueue<>(Comparator.comparingInt(state -> {
             int emptyCellCount = 0;
             int minPossibilities = SIZE + 1;
             for (int i = 0; i < SIZE; i++) {
                 for (int j = 0; j < SIZE; j++) {
-                    if (state.getJuiaLuigiBoard()[i][j] == 0) {
+                    if (state.getSudokuBoard()[i][j] == 0) {
                         emptyCellCount++;
                         int countPoss = 0;
                         String possibilities = state.getPossibleValues(i, j);
@@ -141,22 +150,31 @@ public class SudokuSolver {
                     }
                 }
             }
-            return emptyCellCount + minPossibilities;
+            return emptyCellCount + minPossibilities + state.getPathCost();
         }));
+
         BoardState initialState = new BoardState(sudo_m);
         queue.add(initialState);
         while (!queue.isEmpty()) {
             BoardState currentState = queue.poll();
+            if(visitedStates.contains(currentState)) 
+                continue;
+
+            exploredNodes++;
             if (currentState.isSolved()) {
-                sudo_m = currentState.getJuiaLuigiBoard();
-                ManageMatrix m= new ManageMatrix();
+                sudo_m = currentState.getSudokuBoard();
+                ManageMatrix m = new ManageMatrix();
                 m.printMatrix(sudo_m);
+                System.out.println("Numero nodi esplorati: " + exploredNodes);
+                System.out.println("Numero totale dei nodi generati: " + exploredNodes);
                 return sudo_m;
             }
             List<BoardState> nextStates = currentState.generateNextStates();
+            totalGeneratedNodes++;  //conteggio per ogni stato generato
+            totalGeneratedNodes += nextStates.size();
             queue.addAll(nextStates);
         }
-        return null; // No solution found
+        return null; // Nessuna soluzione trovata
     }
 }
 
