@@ -158,11 +158,6 @@ public class SudokuSolver {
          * ho il minimo numero di possibilità per ogni cella.
          */
         PriorityQueue<BoardState> queue = new PriorityQueue<>(Comparator.comparingInt(state -> {
-         * Setup per la coda prioritaria che deve dare priorità agli stati in cui
-         * ho il minimo numero di possibilità per ogni cella.
-         */
-        
-         PriorityQueue<BoardState> queue = new PriorityQueue<>(Comparator.comparingInt(state -> {
             int emptyCellCount = 0;
             int minPossibilities = SIZE + 1;
             for (int i = 0; i < SIZE; i++) {
@@ -197,18 +192,13 @@ public class SudokuSolver {
                 m.printMatrix(sudo_m);
                 System.out.println("Numero nodi esplorati: " + exploredNodes);
                 System.out.println("Numero totale dei nodi generati: " + totalGeneratedNodes);
-                System.out.println("Numero nodi esplorati: " + exploredNodes);
-                System.out.println("Numero totale dei nodi generati: " + exploredNodes);
                 return sudo_m;
             }
             List<BoardState> nextStates = currentState.generateNextStates();
             totalGeneratedNodes++;  //conteggio per ogni stato generato
             totalGeneratedNodes += nextStates.size();
-            totalGeneratedNodes++;  //conteggio per ogni stato generato
-            totalGeneratedNodes += nextStates.size();
             queue.addAll(nextStates);
         }
         return null; // Soluzione non trovata
-        return null; // Nessuna soluzione trovata
     }
 }
