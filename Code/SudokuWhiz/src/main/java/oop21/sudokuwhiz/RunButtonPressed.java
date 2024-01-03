@@ -9,11 +9,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import utils.SolutionStatistics;
 
-
-///////TO DO : PROVA  A CAMBIARE IL SISTEMA DI RECUPERO DELLA MATRICE 
-////// PROVA A FARE RIFERIMENTO AL FILE, PRIMA DI CHIAMARE IL RISOULTORE 
-////// LA RECUPERO DAL FILE DESCRIPTOR.
 public class RunButtonPressed implements ActionListener{
     private static final int DIVIDE_TO_SECOND = 1000000000; 
     JPanel panel;
@@ -26,12 +23,13 @@ public class RunButtonPressed implements ActionListener{
         this.sudo_m = sudo_m;
         this.choiceAlg = choiceAlg;
         this.runButton = runButton;
-        System.out.println(choiceAlg.getSelection().getActionCommand());       
+        //System.out.println(choiceAlg.getSelection().getActionCommand());
     } 
     @Override
     public void actionPerformed(ActionEvent ae) {
         runButton.setEnabled(false);
         ManageMatrix m = new ManageMatrix();
+        SolutionStatistics stat = new SolutionStatistics();
         m.printMatrix(this.sudo_m);
         SudokuSolver s = new SudokuSolver();
         long startTime = 0;
@@ -40,23 +38,39 @@ public class RunButtonPressed implements ActionListener{
         switch(action){
             case "BackTracking":                
                 startTime = System.nanoTime();
-                s.solve_sudoku_backtrack(this.sudo_m);       
+                s.solve_sudoku_backtrack(this.sudo_m,stat);       
                 endTime = System.nanoTime();
             break;
             case "A_Star":
                 startTime = System.nanoTime();
-                sudo_m = s.solveSudoku_AsteriskA(sudo_m);
+                sudo_m = s.solveSudoku_AsteriskA(sudo_m, stat);
                 endTime = System.nanoTime();
+            break;
+            
+            case "SimulatedAnnealing":
+                startTime = System.nanoTime();
+                System.out.println("Da aggiungere");
+                sudo_m = s.solveSudoku_SimulatedAnnealing(sudo_m);
+                endTime = System.nanoTime();
+            break;  
+            default: 
+                startTime=0;
+                endTime=0; 
             break;    
         }
         JLabel time = (JLabel)panel.getComponent(2);
-        //startTime = System.nanoTime();
-        //s.solve_sudoku_backtrack(sudo_m,objectfied_m,table);        
-        //s.solve_sudoku_backtrack(sudo_m);       
-        //endTime = System.nanoTime();
+        
         long duration = (endTime - startTime);
         double elapsedTimeInSecond = (double) duration / DIVIDE_TO_SECOND;
         time.setText(Double.toString(elapsedTimeInSecond)); 
+        ///Aggiorno le label con le statistiche delle computazioni.
+        JLabel sol_nodes = (JLabel) panel.getComponent(4);
+        sol_nodes.setText(String.valueOf(stat.getSolNodes())); 
+        JLabel exp_nodes = (JLabel) panel.getComponent(6);        
+        exp_nodes.setText(String.valueOf(stat.getExploredNodes()));
+        JLabel gen_nodes = (JLabel) panel.getComponent(8);        
+        gen_nodes.setText(String.valueOf(stat.getGeneratedNodes()));
+        
         JTable table = (JTable) panel.getComponent(0);
         MatrxiModel mm = (MatrxiModel)table.getModel();
         mm.replaceTable(sudo_m);
