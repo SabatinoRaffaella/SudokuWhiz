@@ -54,6 +54,7 @@ Ecco un esempio in foto della finestra a fine esecuzione:
 
 In alto a destra sono riportati: il tempo impiegato per trovare la soluzione, il numero di stati (o nodi dell'albero di ricerca nel caso di backtracking e di ricerca A*) utili per determinare la soluzione,
 il numero di stati esplorati, il numero di stati generati.
+N.B.: i valori sopra indicati fanno riferimento all'esecuzione del programma in un terminale avente processore pari a 2.27 GHz e memoria pari a 4GB.
    
 ### *Organizzazione dei package*
 
