@@ -38,10 +38,32 @@ public class LayoutHelper {
         JLabel time_elapsed = new JLabel("0");
         gbc.gridx = 0;
         gbc.gridy = 0;      
-        gbc.insets = new Insets(0,0,10,5);
+        gbc.insets = new Insets(0,0,0,0);
         panel.add(jLabel3,gbc);
-        gbc.insets = new Insets(12,90,20,5);
+        gbc.insets = new Insets(0,90,0,0);
         panel.add(time_elapsed,gbc); 
+        
+        ///Cerco di aggiungere la label per i nodi esplorati+risultato
+        /// e numero di nodi soluzione esplorati.
+        JLabel test= new JLabel("N° Explored Solution Nodes:");
+        JLabel sol_nodes = new JLabel("0");  
+        gbc.insets = new Insets(40,0,0,0);
+        panel.add(test,gbc);
+        gbc.insets = new Insets(40,165,0,0);
+        panel.add(sol_nodes,gbc);
+        JLabel test2= new JLabel("N° Explored Nodes:");
+        JLabel exp_nodes = new JLabel("0");  
+        gbc.insets = new Insets(70,0,0,0);
+        panel.add(test2,gbc);
+        gbc.insets = new Insets(70,165,0,0);
+        panel.add(exp_nodes,gbc);
+        JLabel test3= new JLabel("N° Generated Nodes:");
+        JLabel gen_nodes = new JLabel("0");  
+        gbc.insets = new Insets(40,230,0,0);
+        panel.add(test3,gbc);
+        gbc.insets = new Insets(40,360,0,0);
+        panel.add(gen_nodes,gbc);
+        
         panel.revalidate();
         panel.repaint();
         frame.add(panel);  
