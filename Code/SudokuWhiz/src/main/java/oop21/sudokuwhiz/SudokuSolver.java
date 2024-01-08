@@ -7,11 +7,17 @@ import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.HashSet;
 import utils.BoardState;
+import utils.ManageMatrix;
 import utils.SolutionStatistics;
+import utils.BoardRandomizer;
+import utils.SudokuPuzzle;
 
 public class SudokuSolver {
 	long countNodes = 0;
 	Set<String> exploredNodes = new HashSet<>();
+	ManageMatrix m = new ManageMatrix();
+	private static final int SIZE = 9;
+	private static final int SUBGRID_SIZE = 3;
 
 	/// ALGORITMO DI BACKTRACKING
 	/**
@@ -152,60 +158,6 @@ public class SudokuSolver {
 		int totalGeneratedNodes = 0; // numero dei nodi generati
 		Set<String> visitedStates = new HashSet<>();
 
-<<<<<<< Updated upstream
-    public int[][] solveSudoku_AsteriskA(int sudo_m[][]) {
-       int exploredNodes = 0; // contatore per tenere traccia dei nodi visitati durante la ricerca
-        int totalGeneratedNodes = 0; // numero dei nodi generati
-        Set<String> visitedStates = new HashSet<>();
-        PriorityQueue<BoardState> queue = new PriorityQueue<>(Comparator.comparingInt(BoardState::getTotalCost));
-        queue.add(new BoardState(sudo_m, 0, s.heuristic1(sudo_m)));
-        visitedStates.add(s.getGridHash(sudo_m));
-        boolean isRoot = true;
-
-        while (!queue.isEmpty()) {
-            BoardState currentNode;
-            if (isRoot) {
-                currentNode = queue.poll();
-                isRoot = false;
-            } else {
-                currentNode = queue.poll();
-            }
-            if (currentNode.isGoal()) {
-                m.copy_Matrix(currentNode.getGrid(), sudo_m);
-                s.recordSolutionStatistics(exploredNodes, exploredNodes, totalGeneratedNodes);
-                System.out.println("Numero nodi esplorati: " + exploredNodes);
-                System.out.println("Numero totale dei nodi generati: " + totalGeneratedNodes);
-                return currentNode.getGrid();
-            }
-            exploredNodes++;
-            List<BoardState> successors = currentNode.generateSuccessors();
-            totalGeneratedNodes++; // conteggio per ogni stato generato
-            totalGeneratedNodes += successors.size();
-            for (BoardState successor : successors) {
-                String successorHash = s.getGridHash(successor.getGrid());
-                if (!visitedStates.contains(successorHash)) {
-                    visitedStates.add(successorHash);
-                    boolean replace = false;
-                    for (BoardState nodeInQueue : queue) {
-                        if (Arrays.deepEquals(successor.getGrid(), nodeInQueue.getGrid()) &&
-                                successor.getTotalCost() < nodeInQueue.getTotalCost()) {
-                            replace = true;
-                            break;
-                        }
-                    }
-
-                    if (replace) {
-                        queue.remove(successor);
-                        queue.add(successor);
-                    } else {
-                        queue.add(successor);
-                    }
-                }
-            }
-        }    
-        return sudo_m;
-    }
-=======
 		PriorityQueue<BoardState> queue = new PriorityQueue<>(Comparator.comparingDouble(BoardState::getTotalCost));
 		queue.add(new BoardState(sudo_m, 0, BoardState.heuristic1(sudo_m)));
 		visitedStates.add(getGridHash(sudo_m));
@@ -252,7 +204,7 @@ public class SudokuSolver {
 					}
 				}
 			}
-		}    
+		}
 		return sudo_m;
 	}
 
@@ -269,5 +221,114 @@ public class SudokuSolver {
 		}
 		return hashBuilder.toString();
 	}
->>>>>>> Stashed changes
+
+	// ALGORITMO DI RICERCA SIMULATED ANNEALING TRADIZIONALE
+
+	public int[][] solveSudoku_SimulatedAnnealing_Tradizionale(int sudo_m[][], SolutionStatistics stat) {
+		List<Integer> original_entries = m.getOriginalEntriesList(sudo_m);
+		BoardRandomizer br = new BoardRandomizer();
+		br.generateRandomSudoku(sudo_m);
+		m.printMatrix(sudo_m);
+
+		SudokuPuzzle currentSudokuPuzzle = new SudokuPuzzle(sudo_m, original_entries);
+		SudokuPuzzle bestSudokuPuzzle = new SudokuPuzzle(sudo_m, original_entries);
+		int currentScore = currentSudokuPuzzle.scoreBoard();
+		int bestScore = currentScore;
+		double temperature = 10000;
+		double coolingFactor = 0.99995;
+		int count = 0;
+		for (double t = temperature; t > 1; t *= coolingFactor) {
+			try {
+
+				if (count % 1000 == 0) {
+					System.out.printf("Iteration %d,\tT = %.5f,\tbest_score = %d,\tcurrent_score = %d%n",
+							count, t, bestScore, currentScore);
+				}
+				int[][] candidateData = currentSudokuPuzzle.makeCandidateData(original_entries);
+				SudokuPuzzle spCandidate = new SudokuPuzzle(candidateData, original_entries);
+				int candidateScore = spCandidate.scoreBoard();
+
+				if (currentSudokuPuzzle.acceptanceProbability(spCandidate, temperature) > Math.random()) {
+					currentSudokuPuzzle = spCandidate;
+					currentScore = candidateScore;
+				}
+
+				if (currentScore < bestScore) {
+
+					bestSudokuPuzzle = new SudokuPuzzle(currentSudokuPuzzle.getData(), original_entries);
+					bestScore = bestSudokuPuzzle.scoreBoard();
+				}
+				if (candidateScore == 0) {
+					currentSudokuPuzzle = spCandidate;
+					break;
+				}
+			} catch (Exception e) {
+				System.out.println("Hit an inexplicable numerical error. It's a random algorithm-- try again.");
+			}
+
+			if (bestScore == 0) {
+				System.out.println("\nSOLVED THE PUZZLE.");
+
+			}
+			count++;
+		}
+		stat.recordSolutionStatistics(count, count, count);
+		return bestSudokuPuzzle.getData();
+	}
+
+	// ALGORITMO DI RICERCA SIMULATED ANNEALING - VARIANTE
+	public int[][] solveSudoku_SimulatedAnnealing(int sudo_m[][], SolutionStatistics stat) {
+		List<Integer> original_entries = m.getOriginalEntriesList(sudo_m);
+		BoardRandomizer br = new BoardRandomizer();
+		br.generateRandomSudoku(sudo_m);
+		m.printMatrix(sudo_m);
+		SudokuPuzzle sudokuPuzzle = new SudokuPuzzle(sudo_m);
+		// sudokuPuzzle.randomizeOnZeroes();
+		SudokuPuzzle bestSudokuPuzzle = new SudokuPuzzle(sudo_m, original_entries);
+		int currentScore = sudokuPuzzle.scoreBoard();
+		int bestScore = currentScore;
+		double temperature = 100;
+		double coolingFactor = 0.995;
+		int max_iterations = 250000;
+		int totalCount = 0;
+		while (temperature > 1) {
+			for (int count = 0; count < max_iterations; count++) {
+				totalCount++;
+				try {
+					if (count % 1000 == 0) {
+						System.out.printf("Iteration %d,\tT = %.5f,\tbest_score = %d,\tcurrent_score = %d%n",
+								count, temperature, bestScore, currentScore);
+					}
+					int[][] candidateData = sudokuPuzzle.makeCandidateDataDup(original_entries);
+					SudokuPuzzle spCandidate = new SudokuPuzzle(candidateData, original_entries);
+					int candidateScore = spCandidate.scoreBoard();
+					double deltaS = currentScore - candidateScore;
+					if (candidateScore < currentScore || Math.exp(deltaS / temperature) - Math.random() > 0) {
+						sudokuPuzzle = spCandidate;
+						currentScore = candidateScore;
+						if (currentScore < bestScore) {
+							bestSudokuPuzzle = new SudokuPuzzle(sudokuPuzzle.getData(), original_entries);
+							bestScore = bestSudokuPuzzle.scoreBoard();
+						}
+					}
+					if (candidateScore == 0) {
+						sudokuPuzzle = spCandidate;
+						break;
+					}
+				} catch (Exception e) {
+					System.out.println("Hit an inexplicable numerical error. It's a random algorithm-- try again.");
+				}
+
+				if (bestScore == 0) {
+					System.out.println("\nSOLVED THE PUZZLE.");
+
+				}
+				totalCount += count;
+			}
+			temperature *= coolingFactor;
+		}
+		stat.recordSolutionStatistics(totalCount, totalCount, totalCount);
+		return bestSudokuPuzzle.getData();
+	}
+
 }
