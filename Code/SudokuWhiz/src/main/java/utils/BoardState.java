@@ -1,16 +1,21 @@
 package utils;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Set;
+
 public class BoardState {
-    private static final int MOVE_COST = 1;
+	
     private static final int INSERT_DELETE_COST = 2;    
     private static final int GRID_SIZE = 9;
     private int[][] grid;
-    private int cost;
+    private double cost;
     private int heuristicValue;
     private int[] lastFilledCell;
-    public BoardState(int[][] grid, int cost, int heuristicValue) {
+    
+    public BoardState(int[][] grid, double cost, int heuristicValue) {
         this.grid = new int[GRID_SIZE][GRID_SIZE];
             copyValues(grid, this.grid);
             this.cost = cost;
@@ -18,7 +23,7 @@ public class BoardState {
             this.lastFilledCell = findLastFilledCell(grid);
     }
 
-    public BoardState(int[][] grid, int cost, int heuristicValue, int[] filledCell) {
+    public BoardState(int[][] grid, double cost, int heuristicValue, int[] filledCell) {
             this.grid = new int[GRID_SIZE][GRID_SIZE];
             copyValues(grid, this.grid);
             this.cost = cost;
@@ -30,7 +35,10 @@ public class BoardState {
         return grid;
     }
 
-    public int getTotalCost() {
+    public void setPathCost(int cost){
+        this.pathCost = cost;
+
+    public double getTotalCost() {
         return cost + heuristicValue;
     }
 
@@ -44,6 +52,51 @@ public class BoardState {
         }
         return true;
     }
+
+    
+    /** Prima Euristica usata per l'algoritmo di ricerca A*
+     * Restituisce il numero di celle bianche contenute all'interno del parametro grid.
+     * @param grid: Matrice di cui si deve calcolare il numero di celle vuote.
+     * @return Numero di celle bianche.
+     */    
+    public static int heuristic1(int[][] grid) {
+        int count = 0;
+        for (int[] row : grid) {
+            for (int cell : row) {
+                if (cell == 0) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+     /** Seconda Euristica usata per l'algoritmo di ricerca A*
+     * Restituisce il numero di possibili valori che una cella può assumere all'interno del parametro grid.
+     * @param grid: Matrice di cui si deve calcolare il numero di celle vuote.
+     * @param row: Riga in cui si trova la cella.
+     * @param col: Colonna in cui si trova la cella.
+     * @return Numero di possibili valori che la cella può assumere.
+     */  
+    public static int heuristic2(int[][] grid, int row, int col) {
+        Set<Integer> options = new HashSet<>();
+        for (int i = 1; i <= 9; i++) {
+            options.add(i);
+        }
+        for (int i = 0; i < 9; i++) {
+            options.remove(grid[row][i]);
+            options.remove(grid[i][col]);
+        }
+        int startRow = 3 * (row / 3);
+        int startCol = 3 * (col / 3);
+        for (int i = startRow; i < startRow + 3; i++) {
+            for (int j = startCol; j < startCol + 3; j++) {
+                options.remove(grid[i][j]);
+            }
+        }
+        return options.size();
+    }    
+    
 
     private int[] findLastFilledCell(int[][] grid) { // viene utilizzata solo per assegnare allo stato iniziale
                                                          // l'ultima cella riempita
@@ -73,6 +126,7 @@ public class BoardState {
         return false; // Nessuna cella bianca trovata
     }
 
+
     public boolean hasEmptyCellsInColumn(int[][] grid, int col) {
         for (int row = 0; row < GRID_SIZE; row++) {
             if (grid[row][col] == 0) {
@@ -81,6 +135,22 @@ public class BoardState {
         }
         return false; // Nessuna cella bianca trovata
     }
+
+    /**
+     * Duplica la tabella di partenza per valutare le diverse alternative proposte dalle
+     * diramazioni per raggiungere lo stato obbiettivo.
+     * @return Un duplicato della tabella del sudoku da usare come nuova diramazione.
+     * 
+     */
+
+    private int[][] copyBoard() {
+        int[][] newBoard = new int[SIZE][SIZE];
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+               newBoard[row][col] = sudo_m[row][col];
+
+
+           
     /**
      * Genera delle soluzioni candidate considerando le celle vuote nelle righe e nelle colonne,
      * cercando le celle vuote e utilizzando la seconda euristica definita per il problema
@@ -90,11 +160,14 @@ public class BoardState {
      * individuo calcolandone il costo e aggiungendolo alla lista delle soluzioni candidate. 
      * @return Restituisce la lista di soluzioni candidate.
      */
+
     public List<BoardState> generateSuccessors() {
-        SolutionStatistics s = new SolutionStatistics();  
+        
         List<BoardState> successors = new ArrayList<>();
         int minOptions = Integer.MAX_VALUE;
         int[] bestCell = null;
+
+
         if (lastFilledCell != null) {
             int row = lastFilledCell[0];
             int col = lastFilledCell[1];
@@ -102,7 +175,9 @@ public class BoardState {
             if (hasEmptyCellsInRow(grid, row)) {
                 for (int i = 0; i < GRID_SIZE; i++) {
                     if (grid[row][i] == 0) {
-                        int options = s.heuristic2(grid, row, i);
+
+                        int options = heuristic2(grid, row, i);
+
                         if (options < minOptions) {
                             minOptions = options;
                             bestCell = new int[] { row, i };
@@ -115,7 +190,9 @@ public class BoardState {
                     if (hasEmptyCellsInRow(grid, i)) {
                         for (int j = 0; j < GRID_SIZE; j++) {
                             if (grid[i][j] == 0) {
-                                int options = s.heuristic2(grid, i, j);
+
+                                int options = heuristic2(grid, i, j);
+
                                 if (options < minOptions) {
                                     minOptions = options;
                                     bestCell = new int[] { i, j };
@@ -130,7 +207,9 @@ public class BoardState {
             if (hasEmptyCellsInColumn(grid, col)) {
                 for (int i = 0; i < GRID_SIZE; i++) {
                     if (grid[i][col] == 0) {
-                        int options = s.heuristic2(grid, i, col);
+
+                        int options = heuristic2(grid, i, col);
+
                         if (options < minOptions) {
                             minOptions = options;
                             bestCell = new int[] { i, col };
@@ -143,7 +222,9 @@ public class BoardState {
                     if (hasEmptyCellsInColumn(grid, j)) {
                         for (int i = 0; i < GRID_SIZE; i++) {
                             if (grid[i][j] == 0) {
-                                int options = s.heuristic2(grid, i, j);
+
+                                int options = heuristic2(grid, i, j);
+
                                 if (options < minOptions) {
                                     minOptions = options;
                                     bestCell = new int[] { i, j };
@@ -155,6 +236,7 @@ public class BoardState {
                 }
             }
         }
+
         if (bestCell != null) {  
             int row = bestCell[0];
             int col = bestCell[1];
@@ -165,8 +247,10 @@ public class BoardState {
                     copyValues(grid, successorGrid);
                     successorGrid[row][col] = value;
 
-                    int moveCost = (grid[row][col] == 0) ? MOVE_COST : INSERT_DELETE_COST;
-                    successors.add(new BoardState(successorGrid, cost + moveCost, s.heuristic1(successorGrid),
+                    
+                    //int moveCost = (grid[row][col] == 0) ? MOVE_COST : INSERT_DELETE_COST;
+                    double moveCost = INSERT_DELETE_COST + euclideanDistance(bestCell, lastFilledCell);
+                    successors.add(new BoardState(successorGrid, cost + moveCost, heuristic1(successorGrid),
                                new int[] { row, col }));
                 }
             }
@@ -174,6 +258,26 @@ public class BoardState {
 
         return successors;
     }
+
+  /* Determina la prima cella della griglia vuota. 
+     * @return firstCell: la posizione (riga, colonna) della prima
+     * cella vuota.
+    */
+    public int[] findFirstEmptyCell() {
+        int[] firstCell = new int[2];
+
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (this.getSudokuBoard()[i][j] == 0) {
+                    firstCell[0] = i;
+                    firstCell[1] = j;
+                    break;
+                }
+            }
+        }
+        return firstCell;
+    }
+
 
         /* Verifico se vengono rispettati i vincoli nella griglia */
     private boolean isSafe(int row, int col, int value) {
@@ -191,12 +295,21 @@ public class BoardState {
                    return false;
                 }
             }
-        }
-        return true;
-    }
-    private void copyValues(int[][] source, int[][] destination) {
+
+    public static void copyValues(int[][] source, int[][] destination) {
         for (int i = 0; i < GRID_SIZE; i++) {
             System.arraycopy(source[i], 0, destination[i], 0, 9);
+
         }
     }
+
+    private double euclideanDistance(int[] bestCell, int[] lastFilledCell) {
+		int x1 = bestCell[0];
+		int y1 = bestCell[1];
+		
+		int x2 = lastFilledCell[0];
+		int y2 = lastFilledCell[1];
+		
+		return Math.sqrt(Math.pow((double) x2-x1, 2) + Math.pow((double)y2-y1, 2));
+	}
 }

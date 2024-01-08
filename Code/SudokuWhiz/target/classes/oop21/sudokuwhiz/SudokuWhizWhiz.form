@@ -85,7 +85,7 @@
                                   <Component id="runButton" min="-2" pref="118" max="-2" attributes="0"/>
                                   <Component id="a_stellato" min="-2" max="-2" attributes="0"/>
                                   <Component id="backtrack" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jRadioButton3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="simulatedAnnealing" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -114,7 +114,7 @@
                   <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
                   <Component id="a_stellato" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
-                  <Component id="jRadioButton3" min="-2" max="-2" attributes="0"/>
+                  <Component id="simulatedAnnealing" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="runButton" min="-2" pref="33" max="-2" attributes="0"/>
                   <EmptySpace pref="266" max="32767" attributes="0"/>
@@ -153,12 +153,12 @@
             <Property name="text" type="java.lang.String" value="A*"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JRadioButton" name="jRadioButton3">
+        <Component class="javax.swing.JRadioButton" name="simulatedAnnealing">
           <Properties>
             <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
               <ComponentRef name="choiceAlg"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="jRadioButton3"/>
+            <Property name="text" type="java.lang.String" value="SimulatedAnnealing"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JSeparator" name="jSeparator1">
