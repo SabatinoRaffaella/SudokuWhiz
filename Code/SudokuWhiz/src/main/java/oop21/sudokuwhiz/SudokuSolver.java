@@ -1,5 +1,8 @@
 package oop21.sudokuwhiz;
 
+import ga.Algorithm;
+import ga.FitnessCalc;
+import ga.Population;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -330,5 +333,29 @@ public class SudokuSolver {
 		stat.recordSolutionStatistics(totalCount, totalCount, totalCount);
 		return bestSudokuPuzzle.getData();
 	}
-
+        //ALGORITMO DI RICERCA GENETICO
+    public int[][] solveSudoku_GeneticAlgorithm(int sudo_m[][]) {
+        List<Integer> hints = m.getOriginalEntriesList(sudo_m);
+         /*GA parametri*/
+        int POPULATION_SIZE = 200;    
+        Population startingPopulation;
+        int MAX_GENERATIONS = 5000;       
+        startingPopulation = new Population(POPULATION_SIZE,sudo_m);
+        int generationCount = 0;
+        FitnessCalc fit = new FitnessCalc();
+            while (generationCount<MAX_GENERATIONS && startingPopulation.getFittest().getFitness() < fit.calculateTotalFitness(startingPopulation)) {
+                generationCount++;
+                System.out.println("Generation: " + generationCount + " Fittest: " + startingPopulation.getFittest().getFitness());
+                startingPopulation = Algorithm.evolvePopulation(startingPopulation,sudo_m,hints);
+                //ManageMatrix m= new ManageMatrix();
+                //m.printMatrix(startingPopulation.getFittest().getSudo_m());
+            }
+            System.out.println("Solution found!");
+            System.out.println("Generation: " + generationCount);
+            System.out.println("Genes:");
+            System.out.println(startingPopulation.getFittest());
+            ManageMatrix m = new ManageMatrix();
+            m.printMatrix(startingPopulation.getFittest().getSudo_m());           
+            return startingPopulation.getFittest().getSudo_m();   
+    }    
 }

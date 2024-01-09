@@ -24,6 +24,7 @@ public class SudokuWhizWhiz extends javax.swing.JFrame {
         backtrack.setSelected(true);
         a_stellato.setActionCommand("A_Star");
         simulatedAnnealing.setActionCommand("SimulatedAnnealing"); 
+        gaButton.setActionCommand("GeneticAlgorithm"); 
         runButton.setEnabled(false);
     }
 
@@ -46,6 +47,7 @@ public class SudokuWhizWhiz extends javax.swing.JFrame {
         jSeparator1 = new javax.swing.JSeparator();
         jLabel2 = new javax.swing.JLabel();
         runButton = new javax.swing.JButton();
+        gaButton = new javax.swing.JRadioButton();
         panel2 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -87,6 +89,9 @@ public class SudokuWhizWhiz extends javax.swing.JFrame {
             }
         });
 
+        choiceAlg.add(gaButton);
+        gaButton.setText("Genetic Algorithm");
+
         javax.swing.GroupLayout panelLayout = new javax.swing.GroupLayout(panel);
         panel.setLayout(panelLayout);
         panelLayout.setHorizontalGroup(
@@ -100,10 +105,12 @@ public class SudokuWhizWhiz extends javax.swing.JFrame {
                         .addGroup(panelLayout.createSequentialGroup()
                             .addGap(10, 10, 10)
                             .addGroup(panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(runButton, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(a_stellato)
                                 .addComponent(backtrack)
-                                .addComponent(simulatedAnnealing))))
+                                .addComponent(simulatedAnnealing)
+                                .addGroup(panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(gaButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(runButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
                     .addGroup(panelLayout.createSequentialGroup()
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(2, 2, 2)))
@@ -126,9 +133,11 @@ public class SudokuWhizWhiz extends javax.swing.JFrame {
                 .addComponent(a_stellato)
                 .addGap(15, 15, 15)
                 .addComponent(simulatedAnnealing)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(gaButton)
                 .addGap(18, 18, 18)
                 .addComponent(runButton, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(266, Short.MAX_VALUE))
+                .addContainerGap(234, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout panel2Layout = new javax.swing.GroupLayout(panel2);
@@ -233,6 +242,7 @@ public class SudokuWhizWhiz extends javax.swing.JFrame {
     private javax.swing.JRadioButton backtrack;
     private javax.swing.JButton callFileChooser;
     private javax.swing.ButtonGroup choiceAlg;
+    private javax.swing.JRadioButton gaButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JSeparator jSeparator1;
