@@ -82,10 +82,13 @@
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="runButton" min="-2" pref="118" max="-2" attributes="0"/>
                                   <Component id="a_stellato" min="-2" max="-2" attributes="0"/>
                                   <Component id="backtrack" min="-2" max="-2" attributes="0"/>
                                   <Component id="simulatedAnnealing" min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
+                                      <Component id="gaButton" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="runButton" alignment="0" max="32767" attributes="0"/>
+                                  </Group>
                               </Group>
                           </Group>
                       </Group>
@@ -115,9 +118,11 @@
                   <Component id="a_stellato" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
                   <Component id="simulatedAnnealing" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Component id="gaButton" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
                   <Component id="runButton" min="-2" pref="33" max="-2" attributes="0"/>
-                  <EmptySpace pref="266" max="32767" attributes="0"/>
+                  <EmptySpace pref="234" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -176,6 +181,14 @@
           <Events>
             <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="runButtonMousePressed"/>
           </Events>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="gaButton">
+          <Properties>
+            <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+              <ComponentRef name="choiceAlg"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Genetic Algorithm"/>
+          </Properties>
         </Component>
       </SubComponents>
     </Container>
