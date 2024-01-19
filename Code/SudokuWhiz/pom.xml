@@ -5,6 +5,25 @@
     <artifactId>SudokuWhizGrafica</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
+
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>3.1.0</version>
+            <configuration>
+                <archive>
+                    <manifest>
+                        <mainClass>oop21.sudokuwhiz.SudokuWhizWhiz</mainClass>
+                    </manifest>
+                </archive>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+
+
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

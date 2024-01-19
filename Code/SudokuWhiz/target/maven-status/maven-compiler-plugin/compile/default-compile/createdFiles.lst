@@ -1,7 +1,6 @@
 oop21\sudokuwhiz\SudokuSolver.class
-oop21\sudokuwhiz\SudokuWhizWhiz$3.class
 oop21\sudokuwhiz\RunButtonPressed.class
-oop21\sudokuwhiz\SudokuWhizWhiz.class
+ga\FitnessCalc.class
 graphics\LayoutHelper.class
 graphics\SudokuRenderer.class
 oop21\sudokuwhiz\SudokuWhizWhiz$1.class
@@ -9,4 +8,12 @@ utils\ManageMatrix.class
 utils\BoardState.class
 oop21\sudokuwhiz\MatrxiModel.class
 oop21\sudokuwhiz\SudokuSelected.class
+ga\Algorithm.class
+utils\SudokuPuzzle.class
+utils\BoardRandomizer.class
+ga\Population.class
+oop21\sudokuwhiz\SudokuWhizWhiz$3.class
+oop21\sudokuwhiz\SudokuWhizWhiz.class
+utils\SolutionStatistics.class
+ga\Individual.class
 oop21\sudokuwhiz\SudokuWhizWhiz$2.class
