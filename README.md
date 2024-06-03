@@ -9,7 +9,7 @@ del gioco, verrà determinata applicando i seguenti algoritmi di ricerca: **back
 **simulated annealing**, **algoritmi genetici generazionali**.
 
 ### Stato del progetto
-In Lavorazione
+Completato e valutato in data 12/01/2024
 
 ### *Come iniziare*
 #### Prerequisiti
